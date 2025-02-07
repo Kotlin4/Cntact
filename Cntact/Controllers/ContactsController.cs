@@ -21,6 +21,11 @@ namespace Cntact.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody]CreateContactRequest request, CancellationToken ct)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var contact = new Contacts(request.Number, request.FirstName, request.Name, request.LastName);
 
             await _dbContext.Contacts.AddAsync(contact, ct);
@@ -32,6 +37,11 @@ namespace Cntact.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery]GetContactsRequest request, CancellationToken ct)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var contactsQuery = _dbContext.Contacts
                 .Where(n => string.IsNullOrEmpty(request.Search) ||
                     n.FirstName.ToLower().Contains(request.Search.ToLower()));
@@ -42,7 +52,7 @@ namespace Cntact.Controllers
             }
             else
             {
-                contactsQuery.OrderBy(n => n.FirstName);
+                contactsQuery = contactsQuery.OrderBy(n => n.FirstName);
             }
 
             var contactDtos = await contactsQuery
@@ -55,12 +65,9 @@ namespace Cntact.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] DeleteContactRequest request, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(request.Number) &&
-                string.IsNullOrWhiteSpace(request.FirstName) &&
-                string.IsNullOrWhiteSpace(request.Name) &&
-                string.IsNullOrWhiteSpace(request.LastName))
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Необходимо указать хотя бы одно поле для поиска.");
+                return BadRequest(ModelState);
             }
 
             var query = _dbContext.Contacts.AsQueryable();

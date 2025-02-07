@@ -1,10 +1,17 @@
 using Cntact.DataAccess;
+using Cntact.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ContactsDbContext>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateContactRequestValidator>();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
