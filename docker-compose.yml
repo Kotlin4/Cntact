@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  cntact:
+    build:
+      context: ./Cntact
+      dockerfile: Dockerfile
+    container_name: cntact
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=my_contacts;Username=postgres;Password=postgres
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: my_contacts
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  
+
+volumes:
+  postgres_data:
